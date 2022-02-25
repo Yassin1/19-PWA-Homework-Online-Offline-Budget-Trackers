@@ -1,12 +1,12 @@
 const version = "1.2";
-window.alert(2);
 
 const cacheName = 'tracker-pwa';
 const filesToCache = [
   '/',
   '/index.html',
   '/index.js',
-  '/styles.css'
+  '/styles.css',
+  "/storage.js"
 ];
 
 /* Start the service worker and cache all of the app's content */
