@@ -14,7 +14,7 @@ app.use(compression());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use(express.static("public"));
+app.use(express.static("Develop/public"));
 
 mongoose.connect("mongodb+srv://yassin1:Prince12@cluster0.dw8ge.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {
   useNewUrlParser: true,
