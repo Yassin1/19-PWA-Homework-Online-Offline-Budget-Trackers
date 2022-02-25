@@ -42,6 +42,8 @@ function populateTable() {
 
 function populateChart() {
   // copy array and reverse it
+  if (!Chart)
+    return;
   let reversed = transactions.slice().reverse();
   let sum = 0;
 
@@ -111,6 +113,11 @@ function sendTransaction(isAdding) {
   populateChart();
   populateTable();
   populateTotal();
+
+  if (!window.navigator.onLine || true) {
+    window.alert("Saving Locally");
+    return addToStore(transaction);
+  }
   
   // also send to server
   fetch("/api/transaction", {
@@ -135,8 +142,9 @@ function sendTransaction(isAdding) {
     }
   })
   .catch(err => {
+    console.log("EE", err);
     // fetch failed, so save in indexed db
-    saveRecord(transaction);
+    //saveRecord(transaction);
 
     // clear form
     nameEl.value = "";
@@ -151,3 +159,42 @@ document.querySelector("#add-btn").onclick = function() {
 document.querySelector("#sub-btn").onclick = function() {
   sendTransaction(false);
 };
+
+function pushLocalData() {
+  if (window.navigator.onLine) {
+    const data = getFromStore();
+    console.log(data);
+    const promises = data.map(tx => {
+      transactions.unshift(tx);
+      fetch("/api/transaction", {
+        method: "POST",
+        body: JSON.stringify(tx),
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json"
+        }
+      })
+    });
+
+    Promise.all(promises)
+    .then(() => {
+      emptyStore();
+      window.alert(11);
+      // re-run logic to populate ui with new record
+      populateChart();
+      populateTable();
+      populateTotal();
+    })
+  }
+}
+
+window.onload = () => {
+  'use strict';
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+             .register('./sw.js');
+  }
+
+  pushLocalData();
+}
